@@ -6,39 +6,14 @@ Version: 1.1
 Author: Ali Hashemi
 */
 
+
+define( 'MY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
+include_once( MY_PLUGIN_DIR . 'includes/class-custom-content-builder-config.php' );
+
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
-}
-
-if ( ! class_exists( 'Custom_Content_Builder_Config' ) ) {
-		
-	class Custom_Content_Builder_Config{
-		public $sections = array();
-		
-		public function __construct() {
-			$section_temp = array('fields'=>array(),'id'=>'setting','label'=>'تنظیمات');
-			$section_temp['fields'][] = array(
-				'type' => 'textbox',
-				'id' => 'telephone',
-				'label' => 'تلفن'			
-				);
-				$section_temp['fields'][] = array(
-				'type' => 'textarea',
-				'id' => 'address',
-				'label' => 'آدرس'			
-				);				
-			$this->sections[] = $section_temp;
-
-			$section_temp = array('fields'=>array(),'id'=>'aboutus','label'=>'درباره ما');
-			$section_temp['fields'][] = array(
-				'type' => 'textarea',
-				'id' => 'aboutus_content',
-				'label' => 'شرح'			
-				);	
-			$this->sections[] = $section_temp;						
-		}
-	}
-
 }
 
 if ( ! class_exists( 'Custom_Content_Builder' ) ) {
@@ -185,12 +160,26 @@ if ( ! class_exists( 'Custom_Content_Builder' ) ) {
 			if($field_obj){
 				if($field_obj['type'] == 'textbox'){
 					$value = get_option( 'custom_content_builder_' . $field_obj['id'], '' );
-					echo '<input type="text" name="custom_content_builder_' . $field_obj['id'] . '" value="' .  esc_attr( $value ) . '" />';		
+					echo '<input type="text" name="custom_content_builder_' . $field_obj['id'] . '" value="' .  esc_attr( $value ) . '" />';
 				}
 				if($field_obj['type'] == 'textarea'){
 					$value = get_option( 'custom_content_builder_' . $field_obj['id'], '' );
 					echo '<textarea style="width:600px;" name="custom_content_builder_' . $field_obj['id'] . '">' . esc_textarea( $value ) . '</textarea>';
 				}				
+				if($field_obj['type'] == 'dropdown'){
+					$value = get_option( 'custom_content_builder_' . $field_obj['id'], '' );
+					$check_default = ($value == '');
+					$html_temp = '<select name="custom_content_builder_' . $field_obj['id'] . '">';
+					foreach($field_obj['options'] as $option){
+						$is_select = ($check_default && isset($option['is_default']) && $option['is_default']);
+						if($option['value'] == $value) $is_select = true;
+						$html_temp .= '<option ' . ($is_select  ? 'selected="selected"' : '') . ' value="' . $option['value'] . '">' . $option['text'] . '</option>';
+					}					
+					$html_temp .= '</select>';
+					echo $html_temp;
+				}				
+				if(isset($field_obj['hint']) && $field_obj['hint'] != '')
+					echo '<p class="description">' . $field_obj['hint'] . '</p>';					
 			}
 
         }
