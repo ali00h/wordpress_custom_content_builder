@@ -7,11 +7,11 @@ Author: Ali Hashemi
 */
 
 
-define( 'MY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-$shortcode_files = scandir(MY_PLUGIN_DIR . 'shortcode/');
+define( 'CCB__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+$shortcode_files = scandir(CCB__PLUGIN_DIR . 'shortcode/');
 $shortcode_file_list = array();
 foreach ($shortcode_files as $file) {
-    $filePath = MY_PLUGIN_DIR . 'shortcode/' . $file;
+    $filePath = CCB__PLUGIN_DIR . 'shortcode/' . $file;
     if (is_file($filePath)) {
         $shortcode_file_list[] = $file;
     }
@@ -19,9 +19,9 @@ foreach ($shortcode_files as $file) {
 define( 'SHORTCODE_FILES', $shortcode_file_list );
 
 
-include_once( MY_PLUGIN_DIR . 'includes/class-custom-content-builder-config.php' );
+include_once( CCB__PLUGIN_DIR . 'includes/class-custom-content-builder-config.php' );
 foreach (SHORTCODE_FILES as $file) {
-	include_once(MY_PLUGIN_DIR . 'shortcode/' . $file);
+	include_once(CCB__PLUGIN_DIR . 'shortcode/' . $file);
 }
 
 
