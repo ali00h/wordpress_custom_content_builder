@@ -8,8 +8,21 @@ Author: Ali Hashemi
 
 
 define( 'MY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+$shortcode_files = scandir(MY_PLUGIN_DIR . 'shortcode/');
+$shortcode_file_list = array();
+foreach ($shortcode_files as $file) {
+    $filePath = MY_PLUGIN_DIR . 'shortcode/' . $file;
+    if (is_file($filePath)) {
+        $shortcode_file_list[] = $file;
+    }
+}
+define( 'SHORTCODE_FILES', $shortcode_file_list );
+
 
 include_once( MY_PLUGIN_DIR . 'includes/class-custom-content-builder-config.php' );
+foreach (SHORTCODE_FILES as $file) {
+	include_once(MY_PLUGIN_DIR . 'shortcode/' . $file);
+}
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,7 +37,11 @@ if ( ! class_exists( 'Custom_Content_Builder' ) ) {
 			$this->config = new Custom_Content_Builder_Config();
             add_action( 'admin_menu', array( $this, 'add_menu' ) );
             add_action( 'admin_init', array( $this, 'register_settings' ) );
-            add_shortcode( 'custom_content_builder', array( $this, 'shortcode' ) );
+			foreach (SHORTCODE_FILES as $file) {
+				$shortcode_name = str_replace('.php','',$file);
+				add_shortcode( $shortcode_name, array( $shortcode_name . '_shortcode', 'callback' ) );
+			}			
+            
         }
 
         public function add_menu() {
@@ -184,18 +201,9 @@ if ( ! class_exists( 'Custom_Content_Builder' ) ) {
 
         }
 
-        public function shortcode() {
-			wp_enqueue_style('my-module-style', plugin_dir_url(__FILE__) . 'assets/css/style.css');
-			wp_enqueue_script('my-module-script', plugin_dir_url(__FILE__) . 'assets/js/main.js', array('jquery'), null, true);
-			
-            $textbox = get_option( 'custom_content_builder_textbox', '' );
-            $textarea = get_option( 'custom_content_builder_textarea', '' );
+		
 
-            return '<div class="mcm_main">
-                        <p>Textbox: ' . esc_html( $textbox ) . '</p>
-                        <p>Textarea: ' . nl2br( esc_html( $textarea ) ) . '</p>
-                    </div>';
-        }
+
     }
 
     new Custom_Content_Builder();
